@@ -1,9 +1,11 @@
-"use client"
+
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { FcGoogle } from "react-icons/fc"
 import { Eye, EyeOff } from "lucide-react"
+import { signUp } from "../api/authApi" 
+
 
 export default function SignUpPage() {
   // State for form fields
@@ -28,13 +30,29 @@ export default function SignUpPage() {
   // Handle form submission
   const handleSubmit =async (e) => {
     e.preventDefault()
-    console.log("Form data:", formData)
+    try {
+      const response = await signUp(formData)
+      if (response.status === 201) {
+        // Redirect to sign-in page or show success message
+        console.log("User created successfully:", response.data)
+        
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+        })
+        // Optionally redirect or show a success message
+      }
+    } catch (error) {
+      console.error("Error signing up:", error)
+      // Handle error (e.g., show error message)
+    }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl">
-        {/* Header - Logo removed */}
+        {/* Header */}
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">Create your account</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
