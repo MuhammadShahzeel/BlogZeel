@@ -1,11 +1,10 @@
-
+"use client"
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { FcGoogle } from "react-icons/fc"
-import { Eye, EyeOff } from "lucide-react"
-import { signUp } from "../api/authApi" 
-
+import { Eye, EyeOff, AlertCircle, X } from "lucide-react"
+import { signUp } from "../api/authApi"
 
 export default function SignUpPage() {
   // State for form fields
@@ -17,6 +16,7 @@ export default function SignUpPage() {
 
   // State for password visibility
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState(null)
 
   // Handle input changes
   const handleChange = (e) => {
@@ -28,14 +28,15 @@ export default function SignUpPage() {
   }
 
   // Handle form submission
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       const response = await signUp(formData)
       if (response.status === 201) {
         // Redirect to sign-in page or show success message
         console.log("User created successfully:", response.data)
-        
+        setError(null)
+
         setFormData({
           username: "",
           email: "",
@@ -44,6 +45,8 @@ export default function SignUpPage() {
         // Optionally redirect or show a success message
       }
     } catch (error) {
+      setError(error.response?.data?.message || "An error occurred during sign up")
+
       console.error("Error signing up:", error)
       // Handle error (e.g., show error message)
     }
@@ -59,6 +62,31 @@ export default function SignUpPage() {
             Join BlogZeel and start exploring amazing content
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 border border-red-100 dark:border-red-900/30 rounded-2xl p-5 shadow-sm animate-in slide-in-from-top-2 duration-300">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-rose-500/5 dark:from-red-500/10 dark:to-rose-500/10"></div>
+            <div className="relative flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="flex items-center justify-center w-8 h-8 bg-red-100 dark:bg-red-900/40 rounded-full">
+                  <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-semibold text-red-900 dark:text-red-100 mb-1">Unable to create account</h4>
+                <p className="text-sm text-red-700 dark:text-red-200 leading-relaxed">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="flex-shrink-0 p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors duration-200 group"
+                aria-label="Dismiss error"
+              >
+                <X className="h-4 w-4 text-red-400 group-hover:text-red-600 dark:group-hover:text-red-300" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -179,6 +207,8 @@ export default function SignUpPage() {
             </p>
           </div>
         </form>
+
+    
       </div>
     </div>
   )
